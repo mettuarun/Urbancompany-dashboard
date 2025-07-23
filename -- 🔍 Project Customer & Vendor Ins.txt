@@ -1,0 +1,51 @@
+-- 🔍 Project: Customer & Vendor Insights Dashboard
+-- 📂 Database: sm_db
+-- 📄 Table: dbo.customer_vendor_final
+-- 📅 Query created for Power BI connection
+
+USE sm_db;
+
+-- 🧮 1. Total Revenue and Order Summary by Service Category
+SELECT
+    service_category,
+    COUNT(DISTINCT order_id) AS total_orders,
+    SUM(grand_total) AS total_revenue,
+    AVG(grand_total) AS average_order_value
+FROM dbo.customer_vendor_final
+WHERE service_status IN ('accepted', 'reached to your location')
+GROUP BY service_category
+ORDER BY total_revenue DESC;
+
+-- 📊 2. Orders by Status
+SELECT
+    service_status,
+    COUNT(*) AS order_count
+FROM dbo.customer_vendor_final
+GROUP BY service_status;
+
+-- 📆 3. Monthly Revenue Trend
+SELECT
+    FORMAT(order_date, 'yyyy-MM') AS order_month,
+    SUM(grand_total) AS monthly_revenue
+FROM dbo.customer_vendor_final
+GROUP BY FORMAT(order_date, 'yyyy-MM')
+ORDER BY order_month;
+
+-- 👥 4. Vendor-wise Performance
+SELECT
+    vendor_name,
+    COUNT(DISTINCT order_id) AS orders_handled,
+    SUM(grand_total) AS total_earned
+FROM dbo.customer_vendor_final
+WHERE service_status = 'reached to your location'
+GROUP BY vendor_name
+ORDER BY total_earned DESC;
+
+-- ❌ 5. Cancellation Analysis
+SELECT
+    cancel_reason,
+    COUNT(*) AS cancel_count
+FROM dbo.customer_vendor_final
+WHERE service_status = 'cancelled'
+GROUP BY cancel_reason
+ORDER BY cancel_count DESC;
